@@ -45,22 +45,25 @@ export const createSpotifyPlaylist = async function (
 export const searchSpotify = async function (songTitle, accessToken) {
   const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
     songTitle
-  )}&type=track&limit=1`;
+  )}&type=track&limit=5`;
+  console.log({ url });
   try {
     const data = await fetchData(url, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    if (data.tracks.items.length > 0) {
-      // console.log(data.tracks.items);
-      return data.tracks.items[0].id; // Returns the first track ID found
-    } else {
-      return null; // No track found
-    }
+    console.log({ album: data.tracks.items[0].album.images[0] });
+    return data.tracks.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      artists: item.artists.map((artist) => artist.name).join(", "),
+      album: item.album.name,
+      albumCover: item.album.images[0].url,
+    }));
   } catch (error) {
     console.error("Failed to search Spotify:", error);
-    throw error; // Re-throw the error to be handled by the caller
+    throw error;
   }
 };
 

@@ -1,0 +1,32 @@
+.carousel-item {
+  text-align: center;
+  min-height: 250px; /* Adjust based on content */
+  background: #eee; /* Light grey background, you can place an image here */
+  color: black;
+  padding: 20px;
+  font-size: 16px;
+}
+
+.track {
+  margin: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px; /* Adds space between each track */
+}
+
+.track-info {
+  flex-grow: 1; /* Allows text section to take up remaining space */
+}
+
+img {
+  margin-left: 20px; /* Adds space between the text and the image */
+}
+
+.highlight {
+  background-color: yellow;
+  color: black;
+}

@@ -99,6 +99,7 @@ app.get("/callback", async (req, res) => {
 });
 
 app.post("/import-songs", async (req, res) => {
+  console.log("import-songs");
   const { songs, playlistName } = req.body; // Capture the playlist name
 
   if (!req.session.accessToken) {
@@ -111,8 +112,7 @@ app.post("/import-songs", async (req, res) => {
     const accessToken = req.session.accessToken;
     const playlistId = await createSpotifyPlaylist(accessToken, playlistName); // Use the custom playlist name
 
-    for (const songTitle of songs) {
-      const trackId = await searchSpotify(songTitle, accessToken);
+    for (const trackId of songs) {
       if (trackId) {
         await addTrackToPlaylist(playlistId, trackId, accessToken);
       }
@@ -123,6 +123,28 @@ app.post("/import-songs", async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to import songs", error: error.message });
+  }
+});
+
+app.post("/search-songs", async (req, res) => {
+  console.log("search-songs");
+
+  const { songs } = req.body;
+  console.log({ songs });
+  if (!req.session.accessToken) {
+    return res.status(403).json({ message: "Not authenticated" });
+  }
+  const { accessToken } = req.session;
+  try {
+    const results = [];
+    for (const songTitle of songs) {
+      results.push(await searchSpotify(songTitle, accessToken));
+    }
+    console.log({ results });
+    res.json(results);
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Failed to fetch search results" });
   }
 });
 
