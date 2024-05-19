@@ -23,6 +23,9 @@ function searchTracks() {
     .then((data) => {
       console.log(data);
 
+      // store the query string (i.e. setlist) in localStorage
+      localStorage.setItem("setList", $("#setList").val());
+
       // Store the search results in localStorage
       localStorage.setItem("searchResults", JSON.stringify(data));
       localStorage.setItem("currentIndex", "0");
@@ -41,14 +44,20 @@ function loadNextBatch() {
   const currentIndex = parseInt(localStorage.getItem("currentIndex") || "0");
   const carousel = $("#searchResultsCarousel");
   const allBatches = JSON.parse(localStorage.getItem("searchResults")) || [];
+  const setList = localStorage.getItem("setList");
 
   if (carousel.hasClass("slick-initialized")) {
     carousel.slick("unslick");
   }
   carousel.html("");
 
+  console.log(currentIndex);
+  console.log(setList);
+  // let searchTerm = "";
+  searchTerm = setList.split("\n")[currentIndex];
+
   if (currentIndex < allBatches.length) {
-    displaySearchResults(allBatches[currentIndex]);
+    displaySearchResults(allBatches[currentIndex], searchTerm);
     localStorage.setItem("currentIndex", (currentIndex + 1).toString());
   } else {
     console.log("No more batches to display.");
@@ -173,6 +182,7 @@ function importPlaylist() {
 }
 
 // Store search results and search term in local storage
+// this should probably be refactored
 function storeResultsInLocalStorage(results, searchTerm = "") {
   localStorage.setItem("searchResults", JSON.stringify(results));
   localStorage.setItem("searchTerm", searchTerm);
@@ -187,6 +197,10 @@ function displaySearchResults(tracks, searchTerm) {
   }
   carousel.html("");
 
+  console.log({ tracks });
+  if (tracks.length) {
+  }
+
   tracks.forEach((track) => {
     const highlightedName = highlightMatchingText(track.name, searchTerm);
     const highlightedArtists = highlightMatchingText(track.artists, searchTerm);
@@ -198,12 +212,14 @@ function displaySearchResults(tracks, searchTerm) {
                 <h4>${highlightedName}</h4>
                 <p>Artist: ${highlightedArtists}</p>
                 <p>Album: ${highlightedAlbum}</p>
+                <img src="${track.albumCover}" alt="Album Cover" height="200" width="200" class="ms-3" />
                 <div class="d-flex">
-                <button class="btn btn-outline-primary select-track-btn" onclick='selectTrack("${track.id}")'>Select</button>
-                <button id="skipButton" class="btn btn-outline-warning" onclick="skipBatch()">Skip</button>
+                  <button class="btn btn-outline-primary select-track-btn" onclick='selectTrack("${track.id}")'>Select</button>
+                  <button id="skipButton" class="btn btn-outline-warning" onclick="skipBatch()">Skip</button>
                 </div>
-            <img src="${track.albumCover}" alt="Album Cover" height="200" width="200" class="ms-3" />
+            </div>
         </div>
+
     `;
     carousel.append(trackDiv);
   });
@@ -269,11 +285,25 @@ function addTrackToPlaylist(track) {
 function highlightMatchingText(text, searchTerm = "") {
   if (!searchTerm) return text; // Return original text if searchTerm is empty
 
-  const words = searchTerm.split(" ").filter((word) => word);
+  // Function to clean text by removing special characters
+  function cleanText(text) {
+    return text.replace(/[^a-zA-Z0-9\s]/g, " ");
+  }
+  // Clean the search term
+  const cleanedSearchTerm = cleanText(searchTerm);
+  const words = cleanedSearchTerm.split(" ").filter((word) => word);
+  console.log(words);
+
+  // Create regex pattern for words, only including alphabetical or numerical characters
   const escapedWords = words.map((word) =>
     word.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&")
   );
   const pattern = new RegExp(`(${escapedWords.join("|")})`, "gi");
+
+  // Clean the text for comparison
+  const cleanedText = cleanText(text);
+
+  // Highlight matching words in the original text
   return text.replace(pattern, '<span class="highlight">$1</span>');
 }
 
@@ -292,7 +322,6 @@ function updateUI(isLoggedIn) {
   const loginBtn = document.getElementById("loginButton");
   const logoutBtn = document.getElementById("logoutButton");
   const playlistName = document.getElementById("playlistName");
-  const playlistNameLabel = document.getElementById("playlistNameLabel");
   const setList = document.getElementById("setList");
   const importBtn = document.getElementById("importButton");
   const searchBtn = document.getElementById("searchButton");
@@ -302,7 +331,6 @@ function updateUI(isLoggedIn) {
     if (loginBtn) loginBtn.style.display = "none";
     if (logoutBtn) logoutBtn.style.display = "block";
     if (playlistName) playlistName.style.display = "block";
-    if (playlistNameLabel) playlistNameLabel.style.display = "block";
     if (setList) setList.style.display = "block";
     if (importBtn) importBtn.style.display = "block";
     if (searchBtn) searchBtn.style.display = "block";
@@ -311,7 +339,6 @@ function updateUI(isLoggedIn) {
     if (loginBtn) loginBtn.style.display = "block";
     if (logoutBtn) logoutBtn.style.display = "none";
     if (playlistName) playlistName.style.display = "none";
-    if (playlistNameLabel) playlistNameLabel.style.display = "none";
     if (setList) setList.style.display = "none";
     if (importBtn) importBtn.style.display = "none";
     if (searchBtn) searchBtn.style.display = "none";

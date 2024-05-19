@@ -42,11 +42,8 @@
       </div>
       <h1 class="mt-5">Import Your DJ Set List to Spotify</h1>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
           <div class="form-group mt-3">
-            <label for="playlistName" id="playlistNameLabel"
-              >Playlist Name:</label
-            >
             <input
               type="text"
               id="playlistName"
@@ -69,17 +66,19 @@
           >
             Search Tracks
           </button>
+        </div>
+        <div class="col-md-12">
+          <div id="searchResultsCarousel" class="carousel"></div>
+        </div>
+        <div class="col-md-12">
+          <ul id="selectedTracksList" class="list-group"></ul>
           <button
             id="importButton"
-            class="btn btn-outline-success mt-3"
+            class="btn btn-outline-success"
             onclick="importPlaylist()"
           >
             Import to Spotify
           </button>
-        </div>
-        <div class="col-md-6">
-          <div id="searchResultsCarousel" class="carousel mt-3"></div>
-          <ul id="selectedTracksList" class="list-group mt-3"></ul>
         </div>
       </div>
     </div>

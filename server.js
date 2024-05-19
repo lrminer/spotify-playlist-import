@@ -140,7 +140,7 @@ app.post("/search-songs", async (req, res) => {
     for (const songTitle of songs) {
       results.push(await searchSpotify(songTitle, accessToken));
     }
-    console.log({ results });
+    // console.log({ results });
     res.json(results);
   } catch (error) {
     console.error("Search error:", error);

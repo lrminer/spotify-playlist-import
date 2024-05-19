@@ -53,13 +53,13 @@ export const searchSpotify = async function (songTitle, accessToken) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    console.log({ album: data.tracks.items[0].album.images[0] });
+    // console.log({ album: data.tracks.items[0].album.images[0] });
     return data.tracks.items.map((item) => ({
       id: item.id,
       name: item.name,
       artists: item.artists.map((artist) => artist.name).join(", "),
-      album: item.album.name,
-      albumCover: item.album.images[0].url,
+      album: item?.album?.name,
+      albumCover: item?.album?.images[0]?.url,
     }));
   } catch (error) {
     console.error("Failed to search Spotify:", error);
